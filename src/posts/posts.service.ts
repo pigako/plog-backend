@@ -7,7 +7,7 @@ import { Post } from "./entities/post.entity";
 export class PostsService {
     constructor(@InjectRepository(Post) private readonly post: Repository<Post>) {}
 
-    test(): any {
+    test(): string {
         return "Hello";
     }
 }

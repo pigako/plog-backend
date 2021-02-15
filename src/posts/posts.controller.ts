@@ -7,7 +7,7 @@ export class PostsController {
     constructor(private readonly postsService: PostsService) {}
 
     @Get("/")
-    test(@Res() res: Response) {
-        res.send(this.postsService.test());
+    test(@Res() res: Response): Response {
+        return res.send(this.postsService.test());
     }
 }
