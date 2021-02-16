@@ -10,6 +10,7 @@ import { Post } from "./entities/post.entity";
 export class PostsService {
     constructor(@InjectRepository(Post) private readonly post: Repository<Post>) {}
 
+    // 목록 조회
     async getList(): Promise<GetPostsOutput> {
         try {
             const list = await this.post.find();
@@ -32,6 +33,7 @@ export class PostsService {
         }
     }
 
+    // 게시물 생성
     async create({ title, contents }: CreatePostInput): Promise<CreatePostOutput> {
         try {
             await this.post.save(
@@ -57,8 +59,10 @@ export class PostsService {
         }
     }
 
+    // 게시물 조회
     async getPost(postId: number): Promise<GetPostOutput> {
         try {
+            await this.post.increment({ id: 5 }, "lookup", 1);
             const data = await this.post.findOne(postId);
 
             return {
