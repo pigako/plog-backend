@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res } from "@nestjs/common";
+import { Controller, Get, Post, Req, Res } from "@nestjs/common";
 import { Response } from "express";
 import { PostsService } from "./posts.service";
 
@@ -9,5 +9,12 @@ export class PostsController {
     @Get("/")
     test(@Res() res: Response): Response {
         return res.send(this.postsService.test());
+    }
+
+    @Post("/")
+    async create(@Res() res: Response): Promise<Response> {
+        const result = await this.postsService.create();
+
+        return res.send(result);
     }
 }

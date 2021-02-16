@@ -10,4 +10,23 @@ export class PostsService {
     test(): string {
         return "Hello";
     }
+
+    async create(): Promise<boolean> {
+        try {
+            console.log("start");
+
+            await this.post.save(
+                this.post.create({
+                    title: "테스트입니다.",
+                    contents: "테스트 내용입니다.",
+                    lookup: 0
+                })
+            );
+
+            return true;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
 }
