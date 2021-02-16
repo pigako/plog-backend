@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Req, Res } from "@nestjs/common";
-import { Response } from "express";
+import { Body, Controller, Get, Post } from "@nestjs/common";
+import { CreatePostInput, CreatePostOutput } from "./dto/create-posts.dto";
+import { GetPostsOutput } from "./dto/get-posts.dto";
 import { PostsService } from "./posts.service";
 
 @Controller("posts")
@@ -7,14 +8,12 @@ export class PostsController {
     constructor(private readonly postsService: PostsService) {}
 
     @Get("/")
-    test(@Res() res: Response): Response {
-        return res.send(this.postsService.test());
+    async list(): Promise<GetPostsOutput> {
+        return await this.postsService.list();
     }
 
     @Post("/")
-    async create(@Res() res: Response): Promise<Response> {
-        const result = await this.postsService.create();
-
-        return res.send(result);
+    async create(@Body() createPostInput: CreatePostInput): Promise<CreatePostOutput> {
+        return await this.postsService.create(createPostInput);
     }
 }
