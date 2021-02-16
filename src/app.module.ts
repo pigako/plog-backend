@@ -3,7 +3,9 @@ import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as Joi from "joi";
 import { Post } from "./posts/entities/post.entity";
+import { Comment } from "./comments/entities/comments.entity";
 import { PostsModule } from "./posts/posts.module";
+import { CommentsModule } from "./comments/comments.module";
 
 @Module({
     imports: [
@@ -26,11 +28,13 @@ import { PostsModule } from "./posts/posts.module";
             username: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
+            timezone: "+09:00",
             synchronize: true,
             logging: true,
-            entities: [Post]
+            entities: [Post, Comment]
         }),
-        PostsModule
+        PostsModule,
+        CommentsModule
     ],
     controllers: [],
     providers: []
