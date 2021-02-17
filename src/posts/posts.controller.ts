@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "src/auth/auth.guard";
 import { CreatePostInput, CreatePostOutput } from "./dto/create-posts.dto";
 import { GetPostOutput } from "./dto/get-post.dto";
 import { GetPostsOutput } from "./dto/get-posts.dto";
@@ -9,11 +10,13 @@ export class PostsController {
     constructor(private readonly postsService: PostsService) {}
 
     @Get("/")
+    @UseGuards(AuthGuard)
     async list(): Promise<GetPostsOutput> {
         return await this.postsService.getList();
     }
 
     @Post("/")
+    @UseGuards(AuthGuard)
     async create(@Body() createPostInput: CreatePostInput): Promise<CreatePostOutput> {
         return await this.postsService.create(createPostInput);
     }
