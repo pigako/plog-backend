@@ -3,8 +3,8 @@ import { CoreEntity } from "src/common/entities/core.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { InternalServerErrorException } from "@nestjs/common";
-import { userInfo } from "os";
 import { Post } from "src/posts/entities/post.entity";
+import { Comment } from "src/comments/entities/comments.entity";
 
 enum Role {
     Admin,
@@ -55,4 +55,10 @@ export class User extends CoreEntity {
         (post) => post.user
     )
     posts: Post[];
+
+    @OneToMany(
+        () => Comment,
+        (comment) => comment.user
+    )
+    comments: Comment[];
 }
