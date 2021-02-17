@@ -1,8 +1,10 @@
 import { IsEnum, IsString } from "class-validator";
 import { CoreEntity } from "src/common/entities/core.entity";
-import { BeforeInsert, BeforeUpdate, Column } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { InternalServerErrorException } from "@nestjs/common";
+import { userInfo } from "os";
+import { Post } from "src/posts/entities/post.entity";
 
 enum Role {
     Admin,
@@ -10,6 +12,7 @@ enum Role {
     User
 }
 
+@Entity()
 export class User extends CoreEntity {
     @Column()
     @IsString()
@@ -46,4 +49,10 @@ export class User extends CoreEntity {
             throw new InternalServerErrorException();
         }
     }
+
+    @OneToMany(
+        () => Post,
+        (post) => post.user
+    )
+    posts: Post[];
 }

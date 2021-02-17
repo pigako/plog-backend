@@ -7,7 +7,8 @@ import { Comment } from "./comments/entities/comments.entity";
 import { PostsModule } from "./posts/posts.module";
 import { CommentsModule } from "./comments/comments.module";
 import { AuthModule } from "./auth/auth.module";
-import { UserModule } from './user/user.module';
+import { UserModule } from "./user/user.module";
+import { User } from "./user/entities/user.entity";
 
 @Module({
     imports: [
@@ -34,7 +35,7 @@ import { UserModule } from './user/user.module';
             timezone: "+09:00",
             synchronize: true,
             logging: true,
-            entities: [Post, Comment]
+            entities: [Post, Comment, User]
         }),
         PostsModule,
         CommentsModule,
