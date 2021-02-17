@@ -6,6 +6,8 @@ import { Post } from "./posts/entities/post.entity";
 import { Comment } from "./comments/entities/comments.entity";
 import { PostsModule } from "./posts/posts.module";
 import { CommentsModule } from "./comments/comments.module";
+import { AuthModule } from "./auth/auth.module";
+import { UserModule } from './user/user.module';
 
 @Module({
     imports: [
@@ -18,7 +20,8 @@ import { CommentsModule } from "./comments/comments.module";
                 DB_USERNAME: Joi.string().required(),
                 DB_PASSWORD: Joi.string().required(),
                 DB_NAME: Joi.string().required(),
-                PRIVATE_KEY: Joi.string().required()
+                PRIVATE_KEY: Joi.string().required(),
+                SESSION_KEY: Joi.string().required()
             })
         }),
         TypeOrmModule.forRoot({
@@ -34,7 +37,9 @@ import { CommentsModule } from "./comments/comments.module";
             entities: [Post, Comment]
         }),
         PostsModule,
-        CommentsModule
+        CommentsModule,
+        AuthModule,
+        UserModule
     ],
     controllers: [],
     providers: []
