@@ -23,7 +23,7 @@ export class PostsService {
         } catch (error) {
             console.error(error);
 
-            if (Object.keys(ERROR).includes(error.messager)) {
+            if (Object.keys(ERROR).includes(error.message)) {
                 throwError(error.message);
             } else {
                 throwError("INTERNAL_SERVER_ERROR", {
@@ -49,7 +49,7 @@ export class PostsService {
             };
         } catch (error) {
             console.error(error);
-            if (Object.keys(ERROR).includes(error.messager)) {
+            if (Object.keys(ERROR).includes(error.message)) {
                 throwError(error.message);
             } else {
                 throwError("INTERNAL_SERVER_ERROR", {
@@ -72,7 +72,7 @@ export class PostsService {
             };
         } catch (error) {
             console.error(error);
-            if (Object.keys(ERROR).includes(error.messager)) {
+            if (Object.keys(ERROR).includes(error.message)) {
                 throwError(error.message);
             } else {
                 throwError("INTERNAL_SERVER_ERROR", {

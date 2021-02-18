@@ -1,5 +1,5 @@
-import { Body, Controller, HttpStatus, Post, Res } from "@nestjs/common";
-import { Response } from "express";
+import { Body, Controller, Post, Request } from "@nestjs/common";
+import { SigninInput } from "./dto/signin.dto";
 import { SignupInput, SignupOutput } from "./dto/signup.dto";
 import { UserService } from "./user.service";
 
@@ -13,5 +13,7 @@ export class UserController {
     }
 
     @Post("/signin")
-    async signin(): Promise<void> {}
+    async signin(@Request() req) {
+        return req.user;
+    }
 }

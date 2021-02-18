@@ -10,6 +10,10 @@ import { User } from "./entities/user.entity";
 export class UserService {
     constructor(@InjectRepository(User) private readonly user: Repository<User>) {}
 
+    async getUser(userId: string): Promise<User | undefined> {
+        return await this.user.findOne({ userId: userId });
+    }
+
     async signup(signupInput: SignupInput): Promise<SignupOutput> {
         try {
             const findUser = await this.user.findOne({ userId: signupInput.userId });
@@ -32,7 +36,7 @@ export class UserService {
         } catch (error) {
             console.error(error);
 
-            if (Object.keys(ERROR).includes(error.messager)) {
+            if (Object.keys(ERROR).includes(error.message)) {
                 throwError(error.message);
             } else {
                 throwError("INTERNAL_SERVER_ERROR", {
@@ -65,7 +69,7 @@ export class UserService {
         } catch (error) {
             console.error(error);
 
-            if (Object.keys(ERROR).includes(error.messager)) {
+            if (Object.keys(ERROR).includes(error.message)) {
                 throwError(error.message);
             } else {
                 throwError("INTERNAL_SERVER_ERROR", {
