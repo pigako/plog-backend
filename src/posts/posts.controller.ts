@@ -7,23 +7,22 @@ import { PostsService } from "./posts.service";
 
 @Controller("posts")
 export class PostsController {
-    constructor(private readonly postsService: PostsService) {}
+    constructor(private readonly service: PostsService) {}
 
     @Get("/")
     @UseGuards(AuthGuard)
     async list(): Promise<GetPostsOutput> {
-        return await this.postsService.getList();
+        return await this.service.getList();
     }
 
     @Post("/")
     @UseGuards(AuthGuard)
     async create(@Body() createPostInput: CreatePostInput): Promise<CreatePostOutput> {
-        return await this.postsService.create(createPostInput);
+        return await this.service.create(createPostInput);
     }
 
     @Get("/:id")
     async getPost(@Param() id: number): Promise<GetPostOutput> {
-        console.log(id);
-        return await this.postsService.getPost(id);
+        return await this.service.getPost(id);
     }
 }

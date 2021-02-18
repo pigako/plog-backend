@@ -1,5 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { ERROR, throwError } from "src/common/common.error";
 import { Repository } from "typeorm";
 import { CreatePostInput, CreatePostOutput } from "./dto/create-posts.dto";
 import { GetPostOutput } from "./dto/get-post.dto";
@@ -16,20 +17,20 @@ export class PostsService {
             const list = await this.post.find();
 
             return {
-                result: true,
-                data: {
-                    posts: list
-                }
+                statusCode: HttpStatus.OK,
+                posts: list
             };
         } catch (error) {
             console.error(error);
-            return {
-                result: false,
-                error: {
+
+            if (Object.keys(ERROR).includes(error.messager)) {
+                throwError(error.message);
+            } else {
+                throwError("INTERNAL_SERVER_ERROR", {
                     code: "ERROR_DONT_GET_POSTS",
                     message: "게시물 리스트를 불러올 수 없습니다."
-                }
-            };
+                });
+            }
         }
     }
 
@@ -44,18 +45,18 @@ export class PostsService {
             );
 
             return {
-                result: true
+                statusCode: HttpStatus.CREATED
             };
         } catch (error) {
             console.error(error);
-
-            return {
-                result: true,
-                error: {
+            if (Object.keys(ERROR).includes(error.messager)) {
+                throwError(error.message);
+            } else {
+                throwError("INTERNAL_SERVER_ERROR", {
                     code: "ERROR_DONT_CREATE_POST",
                     message: "게시물을 생성할 수 없습니다."
-                }
-            };
+                });
+            }
         }
     }
 
@@ -66,20 +67,19 @@ export class PostsService {
             const data = await this.post.findOne(postId);
 
             return {
-                result: true,
-                data: {
-                    post: data
-                }
+                statusCode: HttpStatus.OK,
+                post: data
             };
         } catch (error) {
             console.error(error);
-            return {
-                result: false,
-                error: {
+            if (Object.keys(ERROR).includes(error.messager)) {
+                throwError(error.message);
+            } else {
+                throwError("INTERNAL_SERVER_ERROR", {
                     code: "ERROR_DONT_GET_POST",
                     message: "게시물을 조회 할 수 없습니다."
-                }
-            };
+                });
+            }
         }
     }
 }

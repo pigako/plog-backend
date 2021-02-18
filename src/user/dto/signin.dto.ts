@@ -1,12 +1,12 @@
 import { IsString } from "class-validator";
 import { CoreOutput } from "src/common/dto/output.dto";
 
-export class CreatePostInput {
+export class SigninInput {
     @IsString()
-    title: string;
+    userId: string;
 
     @IsString()
-    contents: string;
+    password: string;
 }
 
-export class CreatePostOutput extends CoreOutput {}
+export class SigninOutput extends CoreOutput {}

@@ -5,12 +5,7 @@ import * as bcrypt from "bcrypt";
 import { InternalServerErrorException } from "@nestjs/common";
 import { Post } from "src/posts/entities/post.entity";
 import { Comment } from "src/comments/entities/comments.entity";
-
-enum Role {
-    Admin,
-    Manager,
-    User
-}
+import { Role } from "../core/core.constants";
 
 @Entity()
 export class User extends CoreEntity {
@@ -22,7 +17,7 @@ export class User extends CoreEntity {
     @IsString()
     password: string;
 
-    @Column()
+    @Column({ type: "enum", enum: Role })
     @IsEnum(Role)
     role: Role;
 
@@ -31,7 +26,7 @@ export class User extends CoreEntity {
     async hashPassword(): Promise<void> {
         if (this.password) {
             try {
-                this.password = bcrypt.hash(this.password, 10);
+                this.password = await bcrypt.hash(this.password, 10);
             } catch (error) {
                 console.error(error);
 
@@ -42,7 +37,7 @@ export class User extends CoreEntity {
 
     async checkPassword(comparePassword: string): Promise<boolean> {
         try {
-            return bcrypt.compare(comparePassword, this.password);
+            return await bcrypt.compare(comparePassword, this.password);
         } catch (error) {
             console.error(error);
 

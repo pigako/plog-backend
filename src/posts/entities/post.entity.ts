@@ -10,7 +10,7 @@ export class Post extends CoreEntity {
     @IsString()
     title: string;
 
-    @Column()
+    @Column({ type: "text" })
     @IsString()
     contents: string;
 
