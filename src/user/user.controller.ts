@@ -1,4 +1,5 @@
-import { Body, Controller, Post, Request } from "@nestjs/common";
+import { Body, Controller, Post, Request, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { SigninInput } from "./dto/signin.dto";
 import { SignupInput, SignupOutput } from "./dto/signup.dto";
 import { UserService } from "./user.service";
@@ -13,7 +14,5 @@ export class UserController {
     }
 
     @Post("/signin")
-    async signin(@Request() req) {
-        return req.user;
-    }
+    async signin(@Body() signinInput: SigninInput) {}
 }

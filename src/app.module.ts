@@ -37,9 +37,11 @@ import { User } from "./user/entities/user.entity";
             logging: true,
             entities: [Post, Comment, User]
         }),
+        AuthModule.forRoot({
+            privateKey: process.env.PRIVATE_KEY
+        }),
         PostsModule,
         CommentsModule,
-        AuthModule,
         UserModule
     ],
     controllers: [],
