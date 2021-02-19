@@ -1,5 +1,5 @@
-import { Body, Controller, Post, Request, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
+import { Body, Controller, HttpStatus, Post, Res, UseGuards } from "@nestjs/common";
+import { Response } from "express";
 import { SigninInput } from "./dto/signin.dto";
 import { SignupInput, SignupOutput } from "./dto/signup.dto";
 import { UserService } from "./user.service";
@@ -14,5 +14,10 @@ export class UserController {
     }
 
     @Post("/signin")
-    async signin(@Body() signinInput: SigninInput) {}
+    async signin(@Body() signinInput: SigninInput, @Res() response: Response): Promise<Response> {
+        const result = await this.service.signin(signinInput);
+
+        response.cookie("PLOG", { userId: result.userId });
+        return response.status(HttpStatus.OK).json({});
+    }
 }

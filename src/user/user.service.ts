@@ -64,7 +64,8 @@ export class UserService {
             }
 
             return {
-                statusCode: HttpStatus.OK
+                statusCode: HttpStatus.OK,
+                userId: findUser.userId
             };
         } catch (error) {
             console.error(error);

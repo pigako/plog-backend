@@ -28,6 +28,8 @@ async function bootstrap() {
             saveUninitialized: false,
             secret: configService.get("SESSION_KEY"),
             cookie: {
+                domain: ".pigako.com",
+                sameSite: "none",
                 httpOnly: true,
                 secure: true
             },
