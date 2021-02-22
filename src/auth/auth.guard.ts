@@ -1,18 +1,22 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { Observable } from "rxjs";
+import { CanActivate, ExecutionContext, forwardRef, Inject, Injectable } from "@nestjs/common";
+import { RedisService } from "src/redis/redis.service";
+import { UserService } from "src/user/user.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        // const request = context.switchToHttp().getRequest();
+    constructor(private readonly redisService: RedisService, @Inject(forwardRef(() => UserService)) private readonly userService: UserService) {}
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        const request = context.switchToHttp().getRequest();
 
-        // if (request?.body?.access) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
+        const loginUserId = await this.redisService.get(`LOGIN_USER:${request.cookies?.PLOG}`);
 
-        console.log(context);
-        return false;
+        if (!loginUserId) {
+            return false;
+        }
+
+        const user = await this.userService.getUser(<string>loginUserId);
+        request.user = user;
+
+        return true;
     }
 }

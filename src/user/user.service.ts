@@ -1,17 +1,24 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { throwError, ERROR } from "src/common/common.error";
+import { RedisService } from "src/redis/redis.service";
 import { Repository } from "typeorm";
+import { LogoutOutput } from "./dto/logout.dto";
 import { SigninInput, SigninOutput } from "./dto/signin.dto";
 import { SignupInput, SignupOutput } from "./dto/signup.dto";
 import { User } from "./entities/user.entity";
 
 @Injectable()
 export class UserService {
-    constructor(@InjectRepository(User) private readonly user: Repository<User>) {}
+    constructor(@InjectRepository(User) private readonly user: Repository<User>, @Inject(forwardRef(() => RedisService)) private readonly redisService: RedisService) {}
 
     async getUser(userId: string): Promise<User | undefined> {
-        return await this.user.findOne({ userId: userId });
+        return await this.user.findOne(
+            { userId: userId },
+            {
+                select: ["id", "userId", "role"]
+            }
+        );
     }
 
     async signup(signupInput: SignupInput): Promise<SignupOutput> {
@@ -63,6 +70,8 @@ export class UserService {
                 throw new Error("ERROR_DONT_MATCH_PASSWORD");
             }
 
+            this.redisService.set(`LOGIN_USER:${findUser.userId}`, findUser.userId);
+
             return {
                 statusCode: HttpStatus.OK,
                 userId: findUser.userId
@@ -76,6 +85,27 @@ export class UserService {
                 throwError("INTERNAL_SERVER_ERROR", {
                     code: "ERROR_DONT_CREATE_USER",
                     message: "유저를 찾을 수 없습니다."
+                });
+            }
+        }
+    }
+
+    async logout(userId: User["userId"]): Promise<LogoutOutput> {
+        try {
+            await this.redisService.del(userId);
+
+            return {
+                statusCode: HttpStatus.OK
+            };
+        } catch (error) {
+            console.error(error);
+
+            if (Object.keys(ERROR).includes(error.message)) {
+                throwError(error.message);
+            } else {
+                throwError("INTERNAL_SERVER_ERROR", {
+                    code: "EERROR_DONT_LOGOUT",
+                    message: "로그아웃에 실패했습니다."
                 });
             }
         }

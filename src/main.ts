@@ -21,17 +21,19 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.use(helmet());
     app.use(morgan("dev"));
-    app.use(cookieParser());
+    app.use(cookieParser(configService.get("SESSION_KEY")));
     app.use(
         session({
             resave: false,
             saveUninitialized: false,
             secret: configService.get("SESSION_KEY"),
             cookie: {
-                domain: ".pigako.com",
+                // domain: ".pigako.com",
+                domain: "localhost",
                 sameSite: "none",
                 httpOnly: true,
-                secure: true
+                secure: false
+                // secure: true
             },
             name: "PLOG"
         })

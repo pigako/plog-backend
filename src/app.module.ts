@@ -9,12 +9,13 @@ import { CommentsModule } from "./comments/comments.module";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
 import { User } from "./user/entities/user.entity";
+import { RedisModule } from "./redis/redis.module";
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            envFilePath: ".env.dev",
+            envFilePath: process.env.NODE_ENV === "prod" ? ".env.prod" : ".env.dev",
             validationSchema: Joi.object({
                 DB_HOST: Joi.string().required(),
                 DB_PORT: Joi.string().required(),
@@ -22,7 +23,9 @@ import { User } from "./user/entities/user.entity";
                 DB_PASSWORD: Joi.string().required(),
                 DB_NAME: Joi.string().required(),
                 PRIVATE_KEY: Joi.string().required(),
-                SESSION_KEY: Joi.string().required()
+                SESSION_KEY: Joi.string().required(),
+                REDIS_HOST: Joi.string().required(),
+                REDIS_PORT: Joi.string().required()
             })
         }),
         TypeOrmModule.forRoot({
@@ -37,9 +40,11 @@ import { User } from "./user/entities/user.entity";
             logging: true,
             entities: [Post, Comment, User]
         }),
-        AuthModule.forRoot({
-            privateKey: process.env.PRIVATE_KEY
+        RedisModule.forRoot({
+            redisHost: process.env.REDIS_HOST,
+            redisPort: process.env.REDIS_PORT
         }),
+        AuthModule,
         PostsModule,
         CommentsModule,
         UserModule
