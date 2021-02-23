@@ -10,7 +10,6 @@ export class PostsController {
     constructor(private readonly service: PostsService) {}
 
     @Get("/")
-    @UseGuards(AuthGuard)
     async list(): Promise<GetPostsOutput> {
         return await this.service.getList();
     }

@@ -1,0 +1,7 @@
+{
+    "PROJECT_ID": "pigako-blog",
+    "APP_NAME": "api-blog",
+    "ZONE": "asia-northeast3-c",
+    "CLUSTER_NAME": "blog-cluster",
+    "NAMESPACE": "default"
+}
