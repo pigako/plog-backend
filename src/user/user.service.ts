@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { throwError, ERROR } from "src/common/common.error";
 import { RedisService } from "src/redis/redis.service";
 import { Repository } from "typeorm";
-import { LogoutOutput } from "./dto/logout.dto";
+import { LogoutInput, LogoutOutput } from "./dto/logout.dto";
 import { SigninInput, SigninOutput } from "./dto/signin.dto";
 import { SignupInput, SignupOutput } from "./dto/signup.dto";
 import { User } from "./entities/user.entity";
@@ -90,9 +90,9 @@ export class UserService {
         }
     }
 
-    async logout(userId: User["userId"]): Promise<LogoutOutput> {
+    async logout(logoutInput: LogoutInput): Promise<LogoutOutput> {
         try {
-            await this.redisService.del(userId);
+            await this.redisService.del(`LOGIN_USER:${logoutInput.userId}`);
 
             return {
                 statusCode: HttpStatus.OK

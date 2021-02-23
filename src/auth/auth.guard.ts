@@ -8,15 +8,14 @@ export class AuthGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
 
-        const loginUserId = await this.redisService.get(`LOGIN_USER:${request.cookies?.PLOG}`);
+        const loginUserId = await this.redisService.get(`LOGIN_USER:${request.signedCookies?.PLOG}`);
 
         if (!loginUserId) {
             return false;
         }
 
-        const user = await this.userService.getUser(<string>loginUserId);
+        const user = await this.userService.getUser(request.signedCookies.PLOG);
         request.user = user;
-
         return true;
     }
 }

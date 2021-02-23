@@ -2,7 +2,6 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import * as morgan from "morgan";
 import * as cookieParser from "cookie-parser";
-import * as session from "express-session";
 import * as helmet from "helmet";
 import { ConfigService } from "@nestjs/config";
 import { ValidationPipe } from "@nestjs/common";
@@ -22,22 +21,6 @@ async function bootstrap() {
     app.use(helmet());
     app.use(morgan("dev"));
     app.use(cookieParser(configService.get("SESSION_KEY")));
-    app.use(
-        session({
-            resave: false,
-            saveUninitialized: false,
-            secret: configService.get("SESSION_KEY"),
-            cookie: {
-                // domain: ".pigako.com",
-                domain: "localhost",
-                sameSite: "none",
-                httpOnly: true,
-                secure: false
-                // secure: true
-            },
-            name: "PLOG"
-        })
-    );
 
     await app.listen(4000);
 }

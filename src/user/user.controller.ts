@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, HttpStatus, Post, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { Response } from "express";
 import { AuthGuard } from "src/auth/auth.guard";
+import { User } from "src/decorator/user.decorator";
 import { LogoutInput, LogoutOutput } from "./dto/logout.dto";
 import { SigninInput } from "./dto/signin.dto";
 import { SignupInput, SignupOutput } from "./dto/signup.dto";
@@ -19,13 +20,24 @@ export class UserController {
     async signin(@Body() signinInput: SigninInput, @Res() response: Response): Promise<Response> {
         const result = await this.service.signin(signinInput);
 
-        response.cookie("PLOG", result.userId);
+        response.cookie("PLOG", result.userId, {
+            domain: "localhost",
+            path: "/",
+            sameSite: "none",
+            httpOnly: true,
+            secure: false,
+            maxAge: 3600 * 1000,
+            signed: true
+        });
         return response.status(HttpStatus.OK).json(result);
     }
 
     @Delete("/logout")
     @UseGuards(AuthGuard)
-    async logout(@Body() { userId }: LogoutInput): Promise<LogoutOutput> {
-        return this.service.logout(userId);
+    async logout(@User() logoutInput: LogoutInput, @Res() response: Response): Promise<Response> {
+        const result = await this.service.logout(logoutInput);
+
+        // response.cookie("PLOG", "", { maxAge: 0 });
+        return response.status(HttpStatus.OK).send(result);
     }
 }
