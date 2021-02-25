@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as Joi from "joi";
@@ -10,6 +10,7 @@ import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
 import { User } from "./user/entities/user.entity";
 import { RedisModule } from "./redis/redis.module";
+import { HealthcheckMiddleware } from "./middleware/healthcheck.middleware";
 
 @Module({
     imports: [
@@ -28,6 +29,10 @@ import { RedisModule } from "./redis/redis.module";
                 REDIS_PORT: Joi.string().required()
             })
         }),
+        RedisModule.forRoot({
+            redisHost: process.env.REDIS_HOST,
+            redisPort: process.env.REDIS_PORT
+        }),
         TypeOrmModule.forRoot({
             type: "mysql",
             host: process.env.DB_HOST,
@@ -39,10 +44,6 @@ import { RedisModule } from "./redis/redis.module";
             synchronize: true,
             logging: true,
             entities: [Post, Comment, User]
-        }),
-        RedisModule.forRoot({
-            redisHost: process.env.REDIS_HOST,
-            redisPort: process.env.REDIS_PORT
         }),
         AuthModule,
         PostsModule,

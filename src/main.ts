@@ -5,6 +5,7 @@ import * as cookieParser from "cookie-parser";
 import * as helmet from "helmet";
 import { ConfigService } from "@nestjs/config";
 import { ValidationPipe } from "@nestjs/common";
+import { HealthcheckMiddleware } from "./middleware/healthcheck.middleware";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {});
@@ -22,6 +23,10 @@ async function bootstrap() {
     app.use(morgan("dev"));
     app.use(cookieParser(configService.get("SESSION_KEY")));
 
-    await app.listen(4000);
+    app.use(HealthcheckMiddleware);
+
+    const port = process.env.NODE_ENV === "production" ? 80 : 4000;
+
+    await app.listen(port);
 }
 bootstrap();

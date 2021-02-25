@@ -2,13 +2,13 @@
     "steps": [
         {
             "name": "gcr.io/cloud-builders/docker",
-            "args": ["build", "-t", "asia.gcr.io/pigako-blog/default/api-blog:${_CLOUDRUNSTAMP}", "-t", "asia.gcr.io/pigako-blog/default/api-blog:latest", "--build-arg", "APP_NAME=api-blog", "."]
+            "args": ["build", "-t", "asia.gcr.io/pigako-blog/default/blog-api:${_CLOUDRUNSTAMP}", "-t", "asia.gcr.io/pigako-blog/default/blog-api:latest", "--build-arg", "APP_NAME=blog-api", "."]
         },
         {
             "name": "gcr.io/cloud-builders/docker",
-            "args": ["push", "asia.gcr.io/pigako-blog/default/api-blog:${_CLOUDRUNSTAMP}"]
+            "args": ["push", "asia.gcr.io/pigako-blog/default/blog-api:${_CLOUDRUNSTAMP}"]
         }
     ],
     "logsBucket": "gs://pigako-blog_cloudbuild",
-    "images": ["asia.gcr.io/pigako-blog/default/api-blog:latest"]
+    "images": ["asia.gcr.io/pigako-blog/default/blog-api:latest"]
 }

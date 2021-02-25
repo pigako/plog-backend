@@ -1,4 +1,4 @@
-import { CacheModule, DynamicModule, Global, Module } from "@nestjs/common";
+import { DynamicModule, Global, Module } from "@nestjs/common";
 import { CONFIG_OPTIONS, REDIS_CLIENT } from "src/common/common.constants";
 import { RedisModuleOptions } from "./redis.interface";
 import * as redis from "async-redis";
@@ -20,7 +20,10 @@ export class RedisModule {
                 {
                     provide: REDIS_CLIENT,
                     useFactory: async () => {
-                        const redisClient = redis.createClient(options);
+                        const redisClient = redis.createClient({
+                            host: options.redisHost,
+                            port: options.redisPort
+                        });
 
                         return redisClient;
                     }
