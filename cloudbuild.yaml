@@ -1,0 +1,27 @@
+steps:
+
+# 도커 이미지 빌드
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', 
+  '-t', 'asia.gcr.io/$PROJECT_ID/${_NAMESPACE}/${_APP_NAME}:${_CLOUDRUNSTAMP}' ,
+  '-t', 'asia.gcr.io/$PROJECT_ID/${_NAMESPACE}/${_APP_NAME}:latest' ,
+  '--build-arg' , 'ZONE=${_ZONE}' ,
+  '--build-arg' , 'TIMESTAMP=${_CLOUDRUNSTAMP}' ,
+  '--build-arg' , 'APP_NAME=${_APP_NAME}' ,
+  '.']
+
+# 도커 이미지 push
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push','asia.gcr.io/$PROJECT_ID/${_NAMESPACE}/${_APP_NAME}:${_CLOUDRUNSTAMP}']
+
+# 빌드된 이미지를 kubernetes 에 배포
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['set', 'image', 'deployments/${_APP_NAME}', '${_APP_NAME}=asia.gcr.io/$PROJECT_ID/${_NAMESPACE}/${_APP_NAME}:${_CLOUDRUNSTAMP}' , '--namespace=${_NAMESPACE}']
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}'
+
+# 빌드된 이미지를 registry 에 저장
+images: [
+  'asia.gcr.io/$PROJECT_ID/${_NAMESPACE}/${_APP_NAME}:latest'
+]
