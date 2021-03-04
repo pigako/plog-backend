@@ -14,7 +14,9 @@ export class PostsService {
     // 목록 조회
     async getList(): Promise<GetPostsOutput> {
         try {
-            const list = await this.post.find();
+            const list = await this.post.find({
+                relations: ["comments"]
+            });
 
             return {
                 statusCode: HttpStatus.OK,
@@ -63,7 +65,7 @@ export class PostsService {
     // 게시물 조회
     async getPost(postId: number): Promise<GetPostOutput> {
         try {
-            await this.post.increment({ id: 5 }, "lookup", 1);
+            await this.post.increment({ id: postId }, "lookup", 1);
             const data = await this.post.findOne(postId);
 
             return {
