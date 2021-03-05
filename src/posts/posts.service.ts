@@ -6,10 +6,12 @@ import { CreatePostInput, CreatePostOutput } from "./dto/create-posts.dto";
 import { GetPostOutput } from "./dto/get-post.dto";
 import { GetPostsOutput } from "./dto/get-posts.dto";
 import { Post } from "./entities/post.entity";
+import { User } from "../user/entities/user.entity";
+import { UserService } from "src/user/user.service";
 
 @Injectable()
 export class PostsService {
-    constructor(@InjectRepository(Post) private readonly post: Repository<Post>) {}
+    constructor(@InjectRepository(Post) private readonly post: Repository<Post>, private readonly userService: UserService) {}
 
     // 목록 조회
     async getList(): Promise<GetPostsOutput> {
@@ -37,12 +39,15 @@ export class PostsService {
     }
 
     // 게시물 생성
-    async create({ title, contents }: CreatePostInput): Promise<CreatePostOutput> {
+    async create({ title, contents }: CreatePostInput, userId: User["userId"]): Promise<CreatePostOutput> {
         try {
+            const user = await this.userService.getUser(userId);
+
             await this.post.save(
                 this.post.create({
                     title: title,
-                    contents: contents
+                    contents: contents,
+                    user: user
                 })
             );
 

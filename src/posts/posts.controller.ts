@@ -4,7 +4,7 @@ import { CreatePostInput, CreatePostOutput } from "./dto/create-posts.dto";
 import { GetPostOutput } from "./dto/get-post.dto";
 import { GetPostsOutput } from "./dto/get-posts.dto";
 import { PostsService } from "./posts.service";
-
+import { User } from "../decorator/user.decorator";
 @Controller("posts")
 export class PostsController {
     constructor(private readonly service: PostsService) {}
@@ -16,8 +16,8 @@ export class PostsController {
 
     @Post("/")
     @UseGuards(AuthGuard)
-    async create(@Body() createPostInput: CreatePostInput): Promise<CreatePostOutput> {
-        return await this.service.create(createPostInput);
+    async create(@Body() createPostInput: CreatePostInput, @User() user): Promise<CreatePostOutput> {
+        return await this.service.create(createPostInput, user.userId);
     }
 
     @Get("/:id")
