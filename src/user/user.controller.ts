@@ -21,11 +21,11 @@ export class UserController {
         const result = await this.service.signin(signinInput);
 
         response.cookie("PLOG", result.userId, {
-            domain: "localhost",
+            domain: process.env.NODE_ENV === "production" ? "www.pigako.com" : "localhost",
             path: "/",
             sameSite: "none",
             httpOnly: true,
-            secure: false,
+            secure: process.env.NODE_ENV === "production",
             maxAge: 3600 * 1000,
             signed: true
         });
