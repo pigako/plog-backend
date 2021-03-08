@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { throwError, ERROR } from "src/common/common.error";
 import { RedisService } from "src/redis/redis.service";
 import { Repository } from "typeorm";
+import { InfoOutput } from "./dto/info.dto";
 import { LogoutInput, LogoutOutput } from "./dto/logout.dto";
 import { SigninInput, SigninOutput } from "./dto/signin.dto";
 import { SignupInput, SignupOutput } from "./dto/signup.dto";
@@ -11,6 +12,31 @@ import { User } from "./entities/user.entity";
 @Injectable()
 export class UserService {
     constructor(@InjectRepository(User) private readonly user: Repository<User>, @Inject(forwardRef(() => RedisService)) private readonly redisService: RedisService) {}
+
+    async getInfo(userId: string): Promise<InfoOutput> {
+        try {
+            const result = await this.getUser(userId);
+            if (!result) {
+                throw new Error("ERROR_DONT_FIND_USER");
+            }
+
+            return {
+                statusCode: HttpStatus.OK,
+                data: result
+            };
+        } catch (error) {
+            console.error(error);
+
+            if (Object.keys(ERROR).includes(error.message)) {
+                throwError(error.message);
+            } else {
+                throwError("INTERNAL_SERVER_ERROR", {
+                    code: "ERROR_DONT_CREATE_USER",
+                    message: "유저의 정보를 찾을 수 없습니다."
+                });
+            }
+        }
+    }
 
     async getUser(userId: string): Promise<User | undefined> {
         return await this.user.findOne(

@@ -6,6 +6,7 @@ import * as helmet from "helmet";
 import { ConfigService } from "@nestjs/config";
 import { ValidationPipe } from "@nestjs/common";
 import { HealthcheckMiddleware } from "./middleware/healthcheck.middleware";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {});
@@ -24,6 +25,15 @@ async function bootstrap() {
     app.use(cookieParser(configService.get("SESSION_KEY")));
 
     app.use(HealthcheckMiddleware);
+
+    const config = new DocumentBuilder()
+        .setTitle("Pigako Blog API")
+        .setVersion("1.0")
+        .addTag("Plog")
+        .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup("swagger", app, document);
 
     const port = process.env.NODE_ENV === "production" ? 80 : 4000;
 

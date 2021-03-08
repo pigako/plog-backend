@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { Response } from "express";
 import { AuthGuard } from "src/auth/auth.guard";
 import { User } from "src/decorator/user.decorator";
+import { InfoOutput } from "./dto/info.dto";
 import { LogoutInput, LogoutOutput } from "./dto/logout.dto";
 import { SigninInput } from "./dto/signin.dto";
 import { SignupInput, SignupOutput } from "./dto/signup.dto";
@@ -10,6 +11,12 @@ import { UserService } from "./user.service";
 @Controller("user")
 export class UserController {
     constructor(private readonly service: UserService) {}
+
+    @Get("/info")
+    @UseGuards(AuthGuard)
+    async info(@User() user): Promise<InfoOutput> {
+        return await this.service.getInfo(user.userId);
+    }
 
     @Post("/signup")
     async signup(@Body() signupInput: SignupInput): Promise<SignupOutput> {
