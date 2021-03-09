@@ -5,6 +5,9 @@ import { GetPostOutput } from "./dto/get-post.dto";
 import { GetPostsOutput } from "./dto/get-posts.dto";
 import { PostsService } from "./posts.service";
 import { User } from "../decorator/user.decorator";
+import { ApiTags } from "@nestjs/swagger";
+
+@ApiTags("Posts")
 @Controller("posts")
 export class PostsController {
     constructor(private readonly service: PostsService) {}

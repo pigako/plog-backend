@@ -1,19 +1,23 @@
 import { Body, Controller, Delete, Get, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { ApiBody, ApiCookieAuth, ApiCreatedResponse, ApiHeader, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import { AuthGuard } from "src/auth/auth.guard";
 import { User } from "src/decorator/user.decorator";
 import { InfoOutput } from "./dto/info.dto";
 import { LogoutInput, LogoutOutput } from "./dto/logout.dto";
-import { SigninInput } from "./dto/signin.dto";
+import { SigninInput, SigninOutput } from "./dto/signin.dto";
 import { SignupInput, SignupOutput } from "./dto/signup.dto";
 import { UserService } from "./user.service";
 
+@ApiTags("User")
 @Controller("user")
 export class UserController {
     constructor(private readonly service: UserService) {}
 
     @Get("/info")
     @UseGuards(AuthGuard)
+    @ApiCookieAuth("connect.sid")
+    @ApiCreatedResponse({ description: "성공", type: InfoOutput })
     async info(@User() user): Promise<InfoOutput> {
         return await this.service.getInfo(user.userId);
     }
@@ -24,6 +28,11 @@ export class UserController {
     }
 
     @Post("/signin")
+    @ApiBody({ type: SigninInput })
+    @ApiCreatedResponse({
+        description: "성공",
+        type: SigninOutput
+    })
     async signin(@Body() signinInput: SigninInput, @Res() response: Response): Promise<Response> {
         const result = await this.service.signin(signinInput);
 

@@ -30,10 +30,11 @@ async function bootstrap() {
         .setTitle("Pigako Blog API")
         .setVersion("1.0")
         .addTag("Plog")
+        .addCookieAuth("connect.sid")
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup("swagger", app, document);
+    SwaggerModule.setup("api/v1/swagger", app, document);
 
     const port = process.env.NODE_ENV === "production" ? 80 : 4000;
 

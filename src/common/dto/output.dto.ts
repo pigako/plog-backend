@@ -1,4 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
+import { ApiProperty } from "@nestjs/swagger";
 
 class Error {
     code?: string;
@@ -6,6 +7,8 @@ class Error {
 }
 
 export class CoreOutput {
+    @ApiProperty()
     statusCode?: HttpStatus;
+    @ApiProperty()
     error?: Error;
 }

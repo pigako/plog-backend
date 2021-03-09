@@ -11,12 +11,14 @@ import { UserModule } from "./user/user.module";
 import { User } from "./user/entities/user.entity";
 import { RedisModule } from "./redis/redis.module";
 import { HealthcheckMiddleware } from "./middleware/healthcheck.middleware";
+import { Contact } from "./contact.entity";
+import { ContactReply } from "./contact-reply.entity";
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            envFilePath: process.env.NODE_ENV === "production" ? ".env.production" : ".env.dev",
+            envFilePath: process.env.NODE_ENV === "production" ? ".env.prod" : ".env.dev",
             validationSchema: Joi.object({
                 DB_HOST: Joi.string().required(),
                 DB_PORT: Joi.string().required(),
@@ -43,7 +45,7 @@ import { HealthcheckMiddleware } from "./middleware/healthcheck.middleware";
             timezone: "+09:00",
             synchronize: true,
             logging: true,
-            entities: [Post, Comment, User]
+            entities: [Post, Comment, User, Contact, ContactReply]
         }),
         AuthModule,
         PostsModule,
