@@ -16,7 +16,7 @@ export class UserController {
 
     @Get("/info")
     @UseGuards(AuthGuard)
-    @ApiCookieAuth("connect.sid")
+    @ApiCookieAuth()
     @ApiCreatedResponse({ description: "성공", type: InfoOutput })
     async info(@User() user): Promise<InfoOutput> {
         return await this.service.getInfo(user.userId);
@@ -37,7 +37,7 @@ export class UserController {
         const result = await this.service.signin(signinInput);
 
         response.cookie("PLOG", result.userId, {
-            domain: process.env.NODE_ENV === "production" ? "www.pigako.com" : "localhost",
+            domain: process.env.NODE_ENV === "production" ? "pigako.com" : "localhost",
             path: "/",
             sameSite: "none",
             httpOnly: true,
@@ -53,7 +53,6 @@ export class UserController {
     async logout(@User() logoutInput: LogoutInput, @Res() response: Response): Promise<Response> {
         const result = await this.service.logout(logoutInput);
 
-        // response.cookie("PLOG", "", { maxAge: 0 });
         return response.status(HttpStatus.OK).send(result);
     }
 }

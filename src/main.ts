@@ -21,7 +21,15 @@ async function bootstrap() {
     });
     app.useGlobalPipes(new ValidationPipe());
     app.use(helmet());
-    app.use(morgan("dev"));
+    app.use(
+        morgan("dev", {
+            skip: (req, res) => {
+                if (req.hostname == "hc.check") {
+                    return true;
+                }
+            }
+        })
+    );
     app.use(cookieParser(configService.get("SESSION_KEY")));
 
     app.use(HealthcheckMiddleware);
