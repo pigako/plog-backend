@@ -22,7 +22,7 @@ export class UserService {
 
             return {
                 statusCode: HttpStatus.OK,
-                data: result
+                user: result
             };
         } catch (error) {
             console.error(error);
@@ -82,9 +82,14 @@ export class UserService {
 
     async signin(signinInput: SigninInput): Promise<SigninOutput> {
         try {
-            const findUser = await this.user.findOne({
-                userId: signinInput.userId
-            });
+            const findUser = await this.user.findOne(
+                {
+                    userId: signinInput.userId
+                },
+                {
+                    select: ["userId", "role", "password"]
+                }
+            );
 
             if (!findUser) {
                 throw new Error("ERROR_DONT_FIND_USER");
@@ -97,10 +102,10 @@ export class UserService {
             }
 
             this.redisService.set(`LOGIN_USER:${findUser.userId}`, findUser.userId);
-
+            delete findUser["password"];
             return {
                 statusCode: HttpStatus.OK,
-                userId: findUser.userId
+                user: findUser
             };
         } catch (error) {
             console.error(error);

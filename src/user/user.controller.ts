@@ -36,7 +36,7 @@ export class UserController {
     async signin(@Body() signinInput: SigninInput, @Res() response: Response): Promise<Response> {
         const result = await this.service.signin(signinInput);
 
-        response.cookie("PLOG", result.userId, {
+        response.cookie("PLOG", result.user.userId, {
             domain: process.env.NODE_ENV === "production" ? "pigako.com" : "localhost",
             path: "/",
             sameSite: "none",

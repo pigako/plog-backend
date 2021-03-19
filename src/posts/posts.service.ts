@@ -17,7 +17,10 @@ export class PostsService {
     async getList(): Promise<GetPostsOutput> {
         try {
             const list = await this.post.find({
-                relations: ["comments"]
+                relations: ["comments"],
+                order: {
+                    "id": "DESC"
+                }
             });
 
             return {

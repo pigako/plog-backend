@@ -4,5 +4,5 @@ import { User } from "../entities/user.entity";
 
 export class InfoOutput extends CoreOutput {
     @ApiProperty()
-    data?: Partial<User>;
+    user?: Partial<User>;
 }

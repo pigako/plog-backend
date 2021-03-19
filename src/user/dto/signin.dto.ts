@@ -15,5 +15,5 @@ export class SigninInput {
 
 export class SigninOutput extends CoreOutput {
     @ApiProperty()
-    userId: User["userId"];
+    user: User;
 }
