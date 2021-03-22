@@ -16,8 +16,10 @@ export class RedisService {
 
     async get(key: string): Promise<any> {
         try {
-            return JSON.parse(this.redisClient.get(key));
+            const value = await this.redisClient.get(key);
+            return JSON.parse(value);
         } catch (error) {
+            console.error(error);
             return false;
         }
     }
