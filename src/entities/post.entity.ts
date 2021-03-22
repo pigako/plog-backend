@@ -1,8 +1,8 @@
 import { CoreEntity } from "src/common/entities/core.entity";
 import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { IsNumber, IsString } from "class-validator";
-import { Comment } from "src/comments/entities/comments.entity";
-import { User } from "src/user/entities/user.entity";
+import { Comment } from "src/entities/comments.entity";
+import { User } from "src/entities/user.entity";
 
 @Entity()
 export class Post extends CoreEntity {

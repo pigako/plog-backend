@@ -3,9 +3,9 @@ import { CoreEntity } from "src/common/entities/core.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { InternalServerErrorException } from "@nestjs/common";
-import { Post } from "src/posts/entities/post.entity";
-import { Comment } from "src/comments/entities/comments.entity";
-import { Role } from "../core/core.constants";
+import { Post } from "src/entities/post.entity";
+import { Comment } from "src/entities/comments.entity";
+import { Role } from "src/common/common.constants";
 
 @Entity()
 export class User extends CoreEntity {
@@ -17,7 +17,7 @@ export class User extends CoreEntity {
     @IsString()
     password: string;
 
-    @Column({ type: "enum", enum: Role })
+    @Column({ type: "enum", enum: Role, default: Role["User"] })
     @IsEnum(Role)
     role: Role;
 

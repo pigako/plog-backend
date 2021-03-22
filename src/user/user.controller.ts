@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { ApiBody, ApiCookieAuth, ApiCreatedResponse, ApiHeader, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
-import { AuthGuard } from "src/auth/auth.guard";
+import { AuthGuard } from "src/guard/auth.guard";
 import { User } from "src/decorator/user.decorator";
 import { InfoOutput } from "./dto/info.dto";
 import { LogoutInput, LogoutOutput } from "./dto/logout.dto";
@@ -19,6 +19,11 @@ export class UserController {
     @ApiCookieAuth()
     @ApiCreatedResponse({ description: "성공", type: InfoOutput })
     async info(@User() user): Promise<InfoOutput> {
+        return {
+            user: {
+                userId: user.email
+            }
+        };
         return await this.service.getInfo(user.userId);
     }
 

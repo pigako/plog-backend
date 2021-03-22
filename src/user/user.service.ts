@@ -7,11 +7,11 @@ import { InfoOutput } from "./dto/info.dto";
 import { LogoutInput, LogoutOutput } from "./dto/logout.dto";
 import { SigninInput, SigninOutput } from "./dto/signin.dto";
 import { SignupInput, SignupOutput } from "./dto/signup.dto";
-import { User } from "./entities/user.entity";
+import { User } from "../entities/user.entity";
 
 @Injectable()
 export class UserService {
-    constructor(@InjectRepository(User) private readonly user: Repository<User>, @Inject(forwardRef(() => RedisService)) private readonly redisService: RedisService) {}
+    constructor(@InjectRepository(User) private readonly user: Repository<User>, private readonly redisService: RedisService) {}
 
     async getInfo(userId: string): Promise<InfoOutput> {
         try {

@@ -7,16 +7,16 @@ export class RedisService {
 
     async set(key: string, value: string): Promise<boolean> {
         try {
-            this.redisClient.set(key, value);
+            this.redisClient.setex(key, 3600 * 1000, value);
             return true;
         } catch (error) {
             return false;
         }
     }
 
-    async get(key: string): Promise<string | boolean> {
+    async get(key: string): Promise<any> {
         try {
-            return this.redisClient.get(key);
+            return JSON.parse(this.redisClient.get(key));
         } catch (error) {
             return false;
         }

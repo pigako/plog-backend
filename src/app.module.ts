@@ -1,18 +1,15 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as Joi from "joi";
-import { Post } from "./posts/entities/post.entity";
-import { Comment } from "./comments/entities/comments.entity";
+import { Post } from "./entities/post.entity";
+import { Comment } from "./entities/comments.entity";
 import { PostsModule } from "./posts/posts.module";
 import { CommentsModule } from "./comments/comments.module";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
-import { User } from "./user/entities/user.entity";
+import { User } from "./entities/user.entity";
 import { RedisModule } from "./redis/redis.module";
-import { HealthcheckMiddleware } from "./middleware/healthcheck.middleware";
-import { Contact } from "./contact.entity";
-import { ContactReply } from "./contact-reply.entity";
 
 @Module({
     imports: [
@@ -28,7 +25,11 @@ import { ContactReply } from "./contact-reply.entity";
                 PRIVATE_KEY: Joi.string().required(),
                 SESSION_KEY: Joi.string().required(),
                 REDIS_HOST: Joi.string().required(),
-                REDIS_PORT: Joi.string().required()
+                REDIS_PORT: Joi.string().required(),
+                GOOGLE_CLIENT_ID: Joi.string().required(),
+                GOOGLE_CLIENT_SECRET: Joi.string().required(),
+                GOOGLE_REDIRECT_URI: Joi.string().required(),
+                GOOGLE_GRANT_TYPE: Joi.string().required()
             })
         }),
         RedisModule.forRoot({
@@ -45,9 +46,14 @@ import { ContactReply } from "./contact-reply.entity";
             timezone: "+09:00",
             synchronize: true,
             logging: true,
-            entities: [Post, Comment, User, Contact, ContactReply]
+            entities: [__dirname + "/entities/*{.ts,.js}"]
         }),
-        AuthModule,
+        AuthModule.forRoot({
+            GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+            GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+            GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
+            GOOGLE_GRANT_TYPE: process.env.GOOGLE_GRANT_TYPE
+        }),
         PostsModule,
         CommentsModule,
         UserModule

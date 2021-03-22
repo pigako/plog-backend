@@ -1,6 +1,6 @@
 import { IsEnum, IsString } from "class-validator";
+import { Role } from "src/common/common.constants";
 import { CoreOutput } from "src/common/dto/output.dto";
-import { Role } from "../core/core.constants";
 
 export class SignupInput {
     @IsString()

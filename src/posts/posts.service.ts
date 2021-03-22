@@ -5,8 +5,8 @@ import { Repository } from "typeorm";
 import { CreatePostInput, CreatePostOutput } from "./dto/create-posts.dto";
 import { GetPostOutput } from "./dto/get-post.dto";
 import { GetPostsOutput } from "./dto/get-posts.dto";
-import { Post } from "./entities/post.entity";
-import { User } from "../user/entities/user.entity";
+import { Post } from "../entities/post.entity";
+import { User } from "../entities/user.entity";
 import { UserService } from "src/user/user.service";
 
 @Injectable()

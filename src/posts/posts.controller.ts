@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "src/auth/auth.guard";
+import { AuthGuard } from "src/guard/auth.guard";
 import { CreatePostInput, CreatePostOutput } from "./dto/create-posts.dto";
 import { GetPostOutput } from "./dto/get-post.dto";
 import { GetPostsOutput } from "./dto/get-posts.dto";
