@@ -88,7 +88,7 @@ export class AuthService {
 
     async googleAuthLogin(code: string, refreshToken?) {
         try {
-            const data = refreshToken ? this.createLoginGoogleData(code) : this.createRefreshGoogleData(refreshToken);
+            const data = refreshToken ? this.createRefreshGoogleData(refreshToken) : this.createLoginGoogleData(code);
 
             const token = await this.getToken(data);
             if (!token) {
