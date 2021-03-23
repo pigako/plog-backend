@@ -29,7 +29,11 @@ import { RedisModule } from "./redis/redis.module";
                 GOOGLE_CLIENT_ID: Joi.string().required(),
                 GOOGLE_CLIENT_SECRET: Joi.string().required(),
                 GOOGLE_REDIRECT_URI: Joi.string().required(),
-                GOOGLE_GRANT_TYPE: Joi.string().required()
+                GOOGLE_GRANT_TYPE: Joi.string().required(),
+                KAKAO_CLIENT_ID: Joi.string().required(),
+                KAKAO_CLIENT_SECRET: Joi.string().required(),
+                KAKAO_REDIRECT_URI: Joi.string().required(),
+                KAKAO_GRANT_TYPE: Joi.string().required()
             })
         }),
         RedisModule.forRoot({
@@ -52,7 +56,11 @@ import { RedisModule } from "./redis/redis.module";
             GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
             GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
             GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
-            GOOGLE_GRANT_TYPE: process.env.GOOGLE_GRANT_TYPE
+            GOOGLE_GRANT_TYPE: process.env.GOOGLE_GRANT_TYPE,
+            KAKAO_CLIENT_ID: process.env.KAKAO_CLIENT_ID,
+            KAKAO_CLIENT_SECRET: process.env.KAKAO_CLIENT_SECRET,
+            KAKAO_REDIRECT_URI: process.env.KAKAO_REDIRECT_URI,
+            KAKAO_GRANT_TYPE: process.env.KAKAO_GRANT_TYPE
         }),
         PostsModule,
         CommentsModule,

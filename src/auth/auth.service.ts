@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Param } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
@@ -9,10 +9,16 @@ import { RedisService } from "src/redis/redis.service";
 import { CONFIG_OPTIONS } from "src/common/common.constants";
 import { AuthModuleOptions } from "./auth.interface";
 import { GoogleUser } from "src/entities/google-user.entity";
-import { googleUserInfo } from "./dto/google-user-info.dto";
+import { googleUserInfo, kakaoUserInfo } from "./dto/user-info.dto";
+import { KakaoUser } from "src/entities/kakao-user.entity";
 @Injectable()
 export class AuthService {
-    constructor(private readonly redisService: RedisService, @Inject(CONFIG_OPTIONS) private readonly config: AuthModuleOptions, @InjectRepository(GoogleUser) private readonly googleUser: Repository<GoogleUser>) {}
+    constructor(
+        private readonly redisService: RedisService,
+        @Inject(CONFIG_OPTIONS) private readonly config: AuthModuleOptions,
+        @InjectRepository(GoogleUser) private readonly googleUser: Repository<GoogleUser>,
+        @InjectRepository(KakaoUser) private readonly kakaoUser: Repository<KakaoUser>
+    ) {}
 
     createLoginGoogleData(code: string): string {
         const data = {
@@ -37,7 +43,7 @@ export class AuthService {
         return querystring.stringify(data);
     }
 
-    async getToken(data: string) {
+    async getGoogleToken(data: string) {
         return await axios
             .post("https://oauth2.googleapis.com/token", data, {
                 headers: {
@@ -56,7 +62,7 @@ export class AuthService {
             });
     }
 
-    async getInfo(id: string) {
+    async getGoogleInfo(id: string) {
         return await axios
             .get("https://oauth2.googleapis.com/tokeninfo", {
                 "params": {
@@ -90,23 +96,32 @@ export class AuthService {
         try {
             const data = refreshToken ? this.createRefreshGoogleData(refreshToken) : this.createLoginGoogleData(code);
 
-            const token = await this.getToken(data);
+            const token = await this.getGoogleToken(data);
             if (!token) {
                 return false;
             }
 
-            const info = await this.getInfo(token.id_token);
+            const info = await this.getGoogleInfo(token.id_token);
             if (!info) {
                 return false;
             }
+
+            console.log(token);
+            console.log(info);
 
             const cookiename = new Date().getTime().toString(16) + "-" + crypto.randomBytes(8).toString("hex");
             await this.redisService.set(
                 `COOKIE_${cookiename}`,
                 JSON.stringify({
                     type: "google",
-                    token: token,
-                    info: info
+                    accessToken: token.access_token,
+                    refreshToken: token.refresh_token,
+                    expires: new Date().getTime() + token.expires_in,
+
+                    userId: info.sub,
+                    userName: info.name,
+                    userEmail: info.email,
+                    profile: info.picture
                 })
             );
 
@@ -117,13 +132,127 @@ export class AuthService {
             });
 
             return {
-                cookiename: cookiename,
-                email: info.email,
-                name: info.name,
-                picture: info.picture
+                cookiename: cookiename
             };
         } catch (error) {
             console.error(error);
+            return false;
+        }
+    }
+
+    createLoginKakaoData(code: string) {
+        const data = {
+            grant_type: this.config.KAKAO_GRANT_TYPE,
+            client_id: this.config.KAKAO_CLIENT_ID,
+            redirect_uri: this.config.KAKAO_REDIRECT_URI,
+            code: code,
+            client_secret: this.config.KAKAO_CLIENT_SECRET
+        };
+
+        return querystring.stringify(data);
+    }
+
+    createRefreshKakaoData(refreshToken: string) {
+        const data = {
+            grant_type: this.config.KAKAO_GRANT_TYPE,
+            client_id: this.config.KAKAO_CLIENT_ID,
+            refresh_token: refreshToken,
+            client_secret: this.config.KAKAO_CLIENT_SECRET
+        };
+
+        return querystring.stringify(data);
+    }
+
+    async getKakaoToken(data) {
+        return await axios
+            .post("https://kauth.kakao.com/oauth/token", data, {
+                headers: {
+                    "Content-type": "application/x-www-form-urlencoded;charset=utf-8"
+                }
+            })
+            .then((response) => {
+                return response.data;
+            })
+            .catch((error) => {
+                console.error(error);
+
+                return false;
+            });
+    }
+
+    async getKakaoInfo(accessToken) {
+        return await axios
+            .get("https://kapi.kakao.com/v2/user/me", {
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-type": "application/x-www-form-urlencoded;charset=utf-8"
+                }
+            })
+            .then((response) => {
+                return response.data;
+            })
+            .catch((error) => {
+                console.error(error);
+
+                return false;
+            });
+    }
+
+    async kakaoUpsert(userInfo: kakaoUserInfo) {
+        const kakaoUser = await this.kakaoUser.findOne({
+            kakaoId: userInfo.kakaoId
+        });
+
+        if (!kakaoUser) {
+            await this.kakaoUser.save(this.kakaoUser.create(userInfo));
+        }
+    }
+
+    async kakaoAuthLogin(code: string, refreshToken?) {
+        try {
+            const data = refreshToken ? this.createRefreshKakaoData(refreshToken) : this.createLoginKakaoData(code);
+
+            const token = await this.getKakaoToken(data);
+            if (!token) {
+                return false;
+            }
+
+            const info = await this.getKakaoInfo(token.access_token);
+            if (!info) {
+                return false;
+            }
+
+            console.log(token);
+            console.log(info);
+
+            const cookiename = new Date().getTime().toString(16) + "-" + crypto.randomBytes(8).toString("hex");
+            await this.redisService.set(
+                `COOKIE_${cookiename}`,
+                JSON.stringify({
+                    type: "kakao",
+                    accessToken: token.access_token,
+                    refreshToken: token.refresh_token,
+                    expires: new Date().getTime() + token.expires_in,
+
+                    userId: info.id,
+                    userName: info.kakao_account.profile.nickname,
+                    userEmail: info.kakao_account?.email,
+                    profile: info.kakao_account.profile.thumbnail_image_url
+                })
+            );
+
+            this.kakaoUpsert({
+                kakaoId: info.id,
+                kakaoEmail: info.kakao_account?.email,
+                name: info.kakao_account.profile.nickname
+            });
+
+            return {
+                cookiename: cookiename
+            };
+        } catch (error) {
+            console.error(error);
+
             return false;
         }
     }

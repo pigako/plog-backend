@@ -20,9 +20,7 @@ export class UserController {
     @ApiCreatedResponse({ description: "성공", type: InfoOutput })
     async info(@User() user): Promise<InfoOutput> {
         return {
-            user: {
-                userId: user.email
-            }
+            user: user
         };
         return await this.service.getInfo(user.userId);
     }

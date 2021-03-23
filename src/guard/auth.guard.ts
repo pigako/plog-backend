@@ -17,17 +17,24 @@ export class AuthGuard implements CanActivate {
             return false;
         }
 
-        if (authInfo.info.exp - +(new Date().getTime() / 1000).toFixed(0) < 0) {
+        if (authInfo.expires - +(new Date().getTime() - 60 * 1000) < 0) {
             switch (authInfo.type) {
                 case "google":
-                    await this.authService.googleAuthLogin("refresh", authInfo.token.refresh_token);
+                    await this.authService.googleAuthLogin("refresh", authInfo.refreshToken);
                     break;
+                case "kakao":
+                    await this.authService.kakaoAuthLogin("refresh", authInfo.refreshToken);
                 default:
                     break;
             }
         }
 
-        request.user = authInfo.info;
+        request.user = {
+            userId: authInfo.id,
+            userName: authInfo.userName,
+            userEmail: authInfo.userEmail,
+            profile: authInfo.profile
+        };
 
         return true;
     }

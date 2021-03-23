@@ -5,6 +5,7 @@ import { CONFIG_OPTIONS } from "src/common/common.constants";
 import { AuthModuleOptions } from "./auth.interface";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { GoogleUser } from "src/entities/google-user.entity";
+import { KakaoUser } from "src/entities/kakao-user.entity";
 
 @Global()
 @Module({})
@@ -13,7 +14,7 @@ export class AuthModule {
         return {
             module: AuthModule,
             exports: [AuthService],
-            imports: [TypeOrmModule.forFeature([GoogleUser])],
+            imports: [TypeOrmModule.forFeature([GoogleUser, KakaoUser])],
             providers: [
                 AuthService,
                 {
