@@ -33,7 +33,11 @@ import { RedisModule } from "./redis/redis.module";
                 KAKAO_CLIENT_ID: Joi.string().required(),
                 KAKAO_CLIENT_SECRET: Joi.string().required(),
                 KAKAO_REDIRECT_URI: Joi.string().required(),
-                KAKAO_GRANT_TYPE: Joi.string().required()
+                KAKAO_GRANT_TYPE: Joi.string().required(),
+                GITHUB_CLIENT_ID: Joi.string().required(),
+                GITHUB_CLIENT_SECRET: Joi.string().required(),
+                GITHUB_REDIRECT_URI: Joi.string().required(),
+                GITHUB_GRANT_TYPE: Joi.string().required()
             })
         }),
         RedisModule.forRoot({
@@ -60,7 +64,11 @@ import { RedisModule } from "./redis/redis.module";
             KAKAO_CLIENT_ID: process.env.KAKAO_CLIENT_ID,
             KAKAO_CLIENT_SECRET: process.env.KAKAO_CLIENT_SECRET,
             KAKAO_REDIRECT_URI: process.env.KAKAO_REDIRECT_URI,
-            KAKAO_GRANT_TYPE: process.env.KAKAO_GRANT_TYPE
+            KAKAO_GRANT_TYPE: process.env.KAKAO_GRANT_TYPE,
+            GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+            GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+            GITHUB_REDIRECT_URI: process.env.GITHUB_REDIRECT_URI,
+            GITHUB_GRANT_TYPE: process.env.GITHUB_GRANT_TYPE
         }),
         PostsModule,
         CommentsModule,

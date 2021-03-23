@@ -17,6 +17,10 @@ export class AuthGuard implements CanActivate {
             return false;
         }
 
+        if (authInfo.redisExpires - 5 * 60 * 1000 < 0) {
+            this.redisService.expire(`COOKIE_${request.signedCookies?.PLOG}`);
+        }
+
         if (authInfo.expires - +(new Date().getTime() - 60 * 1000) < 0) {
             switch (authInfo.type) {
                 case "google":
@@ -24,6 +28,9 @@ export class AuthGuard implements CanActivate {
                     break;
                 case "kakao":
                     await this.authService.kakaoAuthLogin("refresh", authInfo.refreshToken);
+                    break;
+                case "github":
+                    break;
                 default:
                     break;
             }

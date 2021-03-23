@@ -9,15 +9,17 @@ import { RedisService } from "src/redis/redis.service";
 import { CONFIG_OPTIONS } from "src/common/common.constants";
 import { AuthModuleOptions } from "./auth.interface";
 import { GoogleUser } from "src/entities/google-user.entity";
-import { googleUserInfo, kakaoUserInfo } from "./dto/user-info.dto";
+import { googleUserInfo, kakaoUserInfo, githubUserInfo } from "./dto/user-info.dto";
 import { KakaoUser } from "src/entities/kakao-user.entity";
+import { GithubUser } from "src/entities/github-user.entity";
 @Injectable()
 export class AuthService {
     constructor(
         private readonly redisService: RedisService,
         @Inject(CONFIG_OPTIONS) private readonly config: AuthModuleOptions,
         @InjectRepository(GoogleUser) private readonly googleUser: Repository<GoogleUser>,
-        @InjectRepository(KakaoUser) private readonly kakaoUser: Repository<KakaoUser>
+        @InjectRepository(KakaoUser) private readonly kakaoUser: Repository<KakaoUser>,
+        @InjectRepository(GithubUser) private readonly githubUser: Repository<GithubUser>
     ) {}
 
     createLoginGoogleData(code: string): string {
@@ -117,6 +119,7 @@ export class AuthService {
                     accessToken: token.access_token,
                     refreshToken: token.refresh_token,
                     expires: new Date().getTime() + token.expires_in,
+                    redisExpires: new Date().getTime() + 3600 * 1000,
 
                     userId: info.sub,
                     userName: info.name,
@@ -233,6 +236,7 @@ export class AuthService {
                     accessToken: token.access_token,
                     refreshToken: token.refresh_token,
                     expires: new Date().getTime() + token.expires_in,
+                    redisExpires: new Date().getTime() + 3600 * 1000,
 
                     userId: info.id,
                     userName: info.kakao_account.profile.nickname,
@@ -245,6 +249,126 @@ export class AuthService {
                 kakaoId: info.id,
                 kakaoEmail: info.kakao_account?.email,
                 name: info.kakao_account.profile.nickname
+            });
+
+            return {
+                cookiename: cookiename
+            };
+        } catch (error) {
+            console.error(error);
+
+            return false;
+        }
+    }
+
+    async getGithubToken(data): Promise<any> {
+        return await axios
+            .post(`https://github.com/login/oauth/access_token`, data)
+            .then((response) => {
+                const parsing = querystring.parse(response.data);
+                console.log(parsing);
+                return parsing;
+            })
+            .catch((error) => {
+                console.error(error);
+
+                return false;
+            });
+    }
+
+    async getGithubInfo(accessToken: string) {
+        return await axios
+            .get(`https://api.github.com/user`, {
+                headers: {
+                    "Authorization": `token ${accessToken}`
+                }
+            })
+            .then((response) => {
+                return response.data;
+            })
+            .catch((error) => {
+                console.error(error);
+
+                return false;
+            });
+    }
+
+    async getGithubUserEmail(accessToken: string) {
+        return await axios
+            .get(`https://api.github.com/user/emails`, {
+                headers: {
+                    "Authorization": `token ${accessToken}`
+                }
+            })
+            .then((response) => {
+                console.log(response.data);
+
+                return response.data.find((d) => {
+                    return d.primary;
+                });
+            })
+            .catch((error) => {
+                console.log(error);
+
+                return false;
+            });
+    }
+
+    async githubUpsert(userInfo: githubUserInfo) {
+        const githubUser = await this.githubUser.findOne({
+            githubId: userInfo.githubId
+        });
+
+        if (!githubUser) {
+            await this.githubUser.save(this.githubUser.create(userInfo));
+        }
+    }
+
+    async githubAuthLogin(code: string) {
+        try {
+            const data = {
+                client_id: this.config.GITHUB_CLIENT_ID,
+                redirect_uri: this.config.GITHUB_REDIRECT_URI,
+                code: code,
+                client_secret: this.config.GITHUB_CLIENT_SECRET
+            };
+
+            const token = await this.getGithubToken(data);
+            if (!token) {
+                return false;
+            }
+
+            const info = await this.getGithubInfo(token.access_token);
+            if (!info) {
+                return false;
+            }
+
+            const email = await this.getGithubUserEmail(token.access_token);
+
+            console.log(token);
+            console.log(info);
+            console.log(email);
+
+            const cookiename = new Date().getTime().toString(16) + "-" + crypto.randomBytes(8).toString("hex");
+            await this.redisService.set(
+                `COOKIE_${cookiename}`,
+                JSON.stringify({
+                    type: "github",
+                    accessToken: token.access_token,
+                    expires: new Date().getTime() + 365 * 86400 * 1000,
+                    redisExpires: new Date().getTime() + 3600 * 1000,
+
+                    userId: info.id,
+                    userName: info.name,
+                    userEmail: email.email,
+                    profile: info.avatar_url
+                })
+            );
+
+            this.githubUpsert({
+                githubId: info.id,
+                githubEmail: email.email,
+                name: info.name
             });
 
             return {

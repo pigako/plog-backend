@@ -32,4 +32,12 @@ export class RedisService {
             return false;
         }
     }
+
+    async expire(key: string): Promise<void> {
+        try {
+            await this.redisClient.expire(key, 3600 * 1000);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 }
