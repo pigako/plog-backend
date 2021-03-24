@@ -11,4 +11,9 @@ export interface AuthModuleOptions {
     GITHUB_CLIENT_SECRET: string;
     GITHUB_REDIRECT_URI: string;
     GITHUB_GRANT_TYPE: string;
+    NAVER_CLIENT_ID: string;
+    NAVER_CLIENT_SECRET: string;
+    NAVER_REDIRECT_URI: string;
+    NAVER_GRANT_TYPE: string;
+    NAVER_REFRESH_TYPE: string;
 }

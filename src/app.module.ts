@@ -37,7 +37,12 @@ import { RedisModule } from "./redis/redis.module";
                 GITHUB_CLIENT_ID: Joi.string().required(),
                 GITHUB_CLIENT_SECRET: Joi.string().required(),
                 GITHUB_REDIRECT_URI: Joi.string().required(),
-                GITHUB_GRANT_TYPE: Joi.string().required()
+                GITHUB_GRANT_TYPE: Joi.string().required(),
+                NAVER_CLIENT_ID: Joi.string().required(),
+                NAVER_CLIENT_SECRET: Joi.string().required(),
+                NAVER_REDIRECT_URI: Joi.string().required(),
+                NAVER_GRANT_TYPE: Joi.string().required(),
+                NAVER_REFRESH_TYPE: Joi.string().required()
             })
         }),
         RedisModule.forRoot({
@@ -68,7 +73,12 @@ import { RedisModule } from "./redis/redis.module";
             GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
             GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
             GITHUB_REDIRECT_URI: process.env.GITHUB_REDIRECT_URI,
-            GITHUB_GRANT_TYPE: process.env.GITHUB_GRANT_TYPE
+            GITHUB_GRANT_TYPE: process.env.GITHUB_GRANT_TYPE,
+            NAVER_CLIENT_ID: process.env.NAVER_CLIENT_ID,
+            NAVER_CLIENT_SECRET: process.env.NAVER_CLIENT_SECRET,
+            NAVER_REDIRECT_URI: process.env.NAVER_REDIRECT_URI,
+            NAVER_GRANT_TYPE: process.env.NAVER_GRANT_TYPE,
+            NAVER_REFRESH_TYPE: process.env.NAVER_REFRESH_TYPE
         }),
         PostsModule,
         CommentsModule,

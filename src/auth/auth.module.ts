@@ -7,6 +7,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { GoogleUser } from "src/entities/google-user.entity";
 import { KakaoUser } from "src/entities/kakao-user.entity";
 import { GithubUser } from "src/entities/github-user.entity";
+import { NaverUser } from "src/entities/naver-user.entity";
 
 @Global()
 @Module({})
@@ -15,7 +16,7 @@ export class AuthModule {
         return {
             module: AuthModule,
             exports: [AuthService],
-            imports: [TypeOrmModule.forFeature([GoogleUser, KakaoUser, GithubUser])],
+            imports: [TypeOrmModule.forFeature([GoogleUser, KakaoUser, GithubUser, NaverUser])],
             providers: [
                 AuthService,
                 {

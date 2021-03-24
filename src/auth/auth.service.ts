@@ -9,9 +9,10 @@ import { RedisService } from "src/redis/redis.service";
 import { CONFIG_OPTIONS } from "src/common/common.constants";
 import { AuthModuleOptions } from "./auth.interface";
 import { GoogleUser } from "src/entities/google-user.entity";
-import { googleUserInfo, kakaoUserInfo, githubUserInfo } from "./dto/user-info.dto";
+import { GoogleUserInfo, KakaoUserInfo, GithubUserInfo, NaverUserInfo } from "./dto/user-info.dto";
 import { KakaoUser } from "src/entities/kakao-user.entity";
 import { GithubUser } from "src/entities/github-user.entity";
+import { NaverUser } from "src/entities/naver-user.entity";
 @Injectable()
 export class AuthService {
     constructor(
@@ -19,7 +20,8 @@ export class AuthService {
         @Inject(CONFIG_OPTIONS) private readonly config: AuthModuleOptions,
         @InjectRepository(GoogleUser) private readonly googleUser: Repository<GoogleUser>,
         @InjectRepository(KakaoUser) private readonly kakaoUser: Repository<KakaoUser>,
-        @InjectRepository(GithubUser) private readonly githubUser: Repository<GithubUser>
+        @InjectRepository(GithubUser) private readonly githubUser: Repository<GithubUser>,
+        @InjectRepository(NaverUser) private readonly naverUser: Repository<NaverUser>
     ) {}
 
     createLoginGoogleData(code: string): string {
@@ -83,7 +85,7 @@ export class AuthService {
             });
     }
 
-    async googleUpsert(userInfo: googleUserInfo) {
+    async googleUpsert(userInfo: GoogleUserInfo) {
         const googleUser = await this.googleUser.findOne({
             googleId: userInfo.googleId,
             googleEmail: userInfo.googleEmail
@@ -201,7 +203,7 @@ export class AuthService {
             });
     }
 
-    async kakaoUpsert(userInfo: kakaoUserInfo) {
+    async kakaoUpsert(userInfo: KakaoUserInfo) {
         const kakaoUser = await this.kakaoUser.findOne({
             kakaoId: userInfo.kakaoId
         });
@@ -314,7 +316,7 @@ export class AuthService {
             });
     }
 
-    async githubUpsert(userInfo: githubUserInfo) {
+    async githubUpsert(userInfo: GithubUserInfo) {
         const githubUser = await this.githubUser.findOne({
             githubId: userInfo.githubId
         });
@@ -368,6 +370,119 @@ export class AuthService {
             this.githubUpsert({
                 githubId: info.id,
                 githubEmail: email.email,
+                name: info.name
+            });
+
+            return {
+                cookiename: cookiename
+            };
+        } catch (error) {
+            console.error(error);
+
+            return false;
+        }
+    }
+
+    createLoginNaverData(code: string, state: string) {
+        const data = {
+            grant_type: this.config.NAVER_GRANT_TYPE,
+            client_id: this.config.NAVER_CLIENT_ID,
+            client_secret: this.config.NAVER_CLIENT_SECRET,
+            code: code,
+            state: state
+        };
+
+        return querystring.stringify(data);
+    }
+
+    createRefreshNaverData(refreshToken) {
+        const data = {
+            grant_type: this.config.NAVER_REFRESH_TYPE,
+            client_id: this.config.NAVER_CLIENT_ID,
+            client_secret: this.config.NAVER_CLIENT_SECRET,
+            refresh_token: refreshToken
+        };
+
+        return querystring.stringify(data);
+    }
+
+    async getNaverToken(data) {
+        return await axios
+            .post(`https://nid.naver.com/oauth2.0/token`, data)
+            .then((response) => {
+                return response.data;
+            })
+            .catch((error) => {
+                console.error(error);
+
+                return false;
+            });
+    }
+
+    async getNaverInfo(token_type: string, access_token: string) {
+        return await axios
+            .get("https://openapi.naver.com/v1/nid/me", {
+                headers: {
+                    "Authorization": `${token_type} ${access_token}`
+                }
+            })
+            .then((response) => {
+                return response.data?.response;
+            })
+            .catch((error) => {
+                console.error(error);
+
+                return false;
+            });
+    }
+
+    async naverUpsert(userInfo: NaverUserInfo) {
+        const naverUser = await this.naverUser.findOne({
+            naverId: userInfo.naverId
+        });
+
+        if (!naverUser) {
+            await this.naverUser.save(this.naverUser.create(userInfo));
+        }
+    }
+
+    async naverAuthLogin(code: string, state: string, refreshToken?) {
+        try {
+            const data = refreshToken ? this.createRefreshNaverData(refreshToken) : this.createLoginNaverData(code, state);
+
+            const token = await this.getNaverToken(data);
+            if (!token) {
+                return false;
+            }
+
+            const info = await this.getNaverInfo(token.token_type, token.access_token);
+            if (!info) {
+                return false;
+            }
+
+            console.log(token);
+            console.log(info);
+
+            const cookiename = new Date().getTime().toString(16) + "-" + crypto.randomBytes(8).toString("hex");
+            await this.redisService.set(
+                `COOKIE_${cookiename}`,
+                JSON.stringify({
+                    type: "naver",
+                    accessToken: token.access_token,
+                    refreshToken: token.refresh_token,
+                    expires: new Date().getTime() + parseInt(token.expires_in),
+                    redisExpires: new Date().getTime() + 3600 * 1000,
+
+                    userId: info.id,
+                    userName: info.name,
+                    userEmail: info.email,
+                    profile: info.profile_image
+                })
+            );
+
+            this.naverUpsert({
+                naverId: info.id,
+                naverEmail: info.email,
                 name: info.name
             });
 

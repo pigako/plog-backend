@@ -1,5 +1,5 @@
-import { Controller, Get, HttpCode, Query, Redirect, Res } from "@nestjs/common";
-import { Response } from "express";
+import { Controller, Get, HttpCode, Query, Redirect, Req, Res } from "@nestjs/common";
+import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
 
 @Controller("auth")
@@ -55,6 +55,30 @@ export class AuthController {
     @Redirect("https://www.pigako.com/blog/posts", 302)
     async githubCallback(@Res() response: Response, @Query("code") code: string) {
         const authResult = await this.service.githubAuthLogin(code);
+
+        if (!authResult) {
+            return false;
+        }
+
+        response.cookie("PLOG", authResult.cookiename, {
+            domain: process.env.NODE_ENV === "production" ? ".pigako.com" : "localhost",
+            path: "/",
+            sameSite: "none",
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 3600 * 1000,
+            signed: true
+        });
+
+        if (process.env.NODE_ENV !== "production") {
+            return { url: "http://localhost:3000/blog/posts" };
+        }
+    }
+
+    @Get("naver/callback")
+    @Redirect("https://www.pigako.com/blog/posts", 302)
+    async naverCallback(@Res() response: Response, @Query("code") code: string, @Query("state") state: string) {
+        const authResult = await this.service.naverAuthLogin(code, state);
 
         if (!authResult) {
             return false;

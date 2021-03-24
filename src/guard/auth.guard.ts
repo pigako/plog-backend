@@ -31,6 +31,9 @@ export class AuthGuard implements CanActivate {
                     break;
                 case "github":
                     break;
+                case "naver":
+                    await this.authService.naverAuthLogin("refresh", "refresh", authInfo.refreshToken);
+                    break;
                 default:
                     break;
             }
