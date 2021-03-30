@@ -40,6 +40,7 @@ export class AuthGuard implements CanActivate {
         }
 
         request.user = {
+            type: authInfo.type,
             userId: authInfo.id,
             userName: authInfo.userName,
             userEmail: authInfo.userEmail,

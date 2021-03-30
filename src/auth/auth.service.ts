@@ -6,13 +6,14 @@ import * as querystring from "querystring";
 import * as crypto from "crypto";
 
 import { RedisService } from "src/redis/redis.service";
-import { CONFIG_OPTIONS } from "src/common/common.constants";
+import { CONFIG_OPTIONS, Role } from "src/common/common.constants";
 import { AuthModuleOptions } from "./auth.interface";
 import { GoogleUser } from "src/entities/google-user.entity";
 import { GoogleUserInfo, KakaoUserInfo, GithubUserInfo, NaverUserInfo } from "./dto/user-info.dto";
 import { KakaoUser } from "src/entities/kakao-user.entity";
 import { GithubUser } from "src/entities/github-user.entity";
 import { NaverUser } from "src/entities/naver-user.entity";
+import { AUTH_TYPE } from "./auth.constants";
 @Injectable()
 export class AuthService {
     constructor(
@@ -493,6 +494,54 @@ export class AuthService {
             console.error(error);
 
             return false;
+        }
+    }
+
+    async getRole(type: AUTH_TYPE, id: string) {
+        switch (type) {
+            case AUTH_TYPE["google"]: {
+                return this.googleUser.findOne(
+                    {
+                        googleId: id
+                    },
+                    {
+                        select: ["role"]
+                    }
+                );
+            }
+            case AUTH_TYPE["kakao"]: {
+                return this.kakaoUser.findOne(
+                    {
+                        kakaoId: id
+                    },
+                    {
+                        select: ["role"]
+                    }
+                );
+            }
+            case AUTH_TYPE["github"]: {
+                return this.githubUser.findOne(
+                    {
+                        githubId: id
+                    },
+                    {
+                        select: ["role"]
+                    }
+                );
+            }
+            case AUTH_TYPE["naver"]: {
+                return this.naverUser.findOne(
+                    {
+                        naverId: id
+                    },
+                    {
+                        select: ["role"]
+                    }
+                );
+            }
+            default: {
+                return Role["User"];
+            }
         }
     }
 }
