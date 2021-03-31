@@ -56,8 +56,7 @@ export class AuthService {
                 }
             })
             .then((response) => {
-                console.log(response.data);
-
+                console.log(response);
                 return response.data;
             })
             .catch((error) => {
@@ -75,8 +74,6 @@ export class AuthService {
                 }
             })
             .then((response) => {
-                console.log(response.data);
-
                 return response.data;
             })
             .catch((error) => {
@@ -121,7 +118,7 @@ export class AuthService {
                     type: "google",
                     accessToken: token.access_token,
                     refreshToken: token.refresh_token,
-                    expires: new Date().getTime() + token.expires_in,
+                    expires: new Date().getTime() + parseInt(token.expires_in) * 1000,
                     redisExpires: new Date().getTime() + 3600 * 1000,
 
                     userId: info.sub,
@@ -238,7 +235,7 @@ export class AuthService {
                     type: "kakao",
                     accessToken: token.access_token,
                     refreshToken: token.refresh_token,
-                    expires: new Date().getTime() + token.expires_in,
+                    expires: new Date().getTime() + parseInt(token.expires_in) * 1000,
                     redisExpires: new Date().getTime() + 3600 * 1000,
 
                     userId: info.id,
@@ -471,7 +468,7 @@ export class AuthService {
                     type: "naver",
                     accessToken: token.access_token,
                     refreshToken: token.refresh_token,
-                    expires: new Date().getTime() + parseInt(token.expires_in),
+                    expires: new Date().getTime() + parseInt(token.expires_in) * 1000,
                     redisExpires: new Date().getTime() + 3600 * 1000,
 
                     userId: info.id,

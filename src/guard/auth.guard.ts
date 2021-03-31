@@ -17,6 +17,8 @@ export class AuthGuard implements CanActivate {
             return false;
         }
 
+        console.log(authInfo);
+
         if (authInfo.redisExpires - 5 * 60 * 1000 < 0) {
             this.redisService.expire(`COOKIE_${request.signedCookies?.PLOG}`);
         }
