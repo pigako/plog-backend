@@ -1,5 +1,8 @@
 steps:
 
+- name: gcr.io/cloud-builders/gsutil
+  args: ["cp", "gs://plog-systeminfo-2021-04-01/api-account.json", "."]
+
 # 도커 이미지 빌드
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', 

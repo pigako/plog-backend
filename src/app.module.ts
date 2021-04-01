@@ -2,14 +2,13 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as Joi from "joi";
-import { Post } from "./entities/post.entity";
-import { Comment } from "./entities/comments.entity";
 import { PostsModule } from "./posts/posts.module";
 import { CommentsModule } from "./comments/comments.module";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
-import { User } from "./entities/user.entity";
 import { RedisModule } from "./redis/redis.module";
+import { FileController } from "./file/file.controller";
+import { FileModule } from "./file/file.module";
 
 @Module({
     imports: [
@@ -26,18 +25,23 @@ import { RedisModule } from "./redis/redis.module";
                 SESSION_KEY: Joi.string().required(),
                 REDIS_HOST: Joi.string().required(),
                 REDIS_PORT: Joi.string().required(),
+                GOOGLE_APPLICATION_CREDENTIALS: Joi.string().required(),
+
                 GOOGLE_CLIENT_ID: Joi.string().required(),
                 GOOGLE_CLIENT_SECRET: Joi.string().required(),
                 GOOGLE_REDIRECT_URI: Joi.string().required(),
                 GOOGLE_GRANT_TYPE: Joi.string().required(),
+
                 KAKAO_CLIENT_ID: Joi.string().required(),
                 KAKAO_CLIENT_SECRET: Joi.string().required(),
                 KAKAO_REDIRECT_URI: Joi.string().required(),
                 KAKAO_GRANT_TYPE: Joi.string().required(),
+
                 GITHUB_CLIENT_ID: Joi.string().required(),
                 GITHUB_CLIENT_SECRET: Joi.string().required(),
                 GITHUB_REDIRECT_URI: Joi.string().required(),
                 GITHUB_GRANT_TYPE: Joi.string().required(),
+
                 NAVER_CLIENT_ID: Joi.string().required(),
                 NAVER_CLIENT_SECRET: Joi.string().required(),
                 NAVER_REDIRECT_URI: Joi.string().required(),
@@ -66,20 +70,24 @@ import { RedisModule } from "./redis/redis.module";
             GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
             GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
             GOOGLE_GRANT_TYPE: process.env.GOOGLE_GRANT_TYPE,
+
             KAKAO_CLIENT_ID: process.env.KAKAO_CLIENT_ID,
             KAKAO_CLIENT_SECRET: process.env.KAKAO_CLIENT_SECRET,
             KAKAO_REDIRECT_URI: process.env.KAKAO_REDIRECT_URI,
             KAKAO_GRANT_TYPE: process.env.KAKAO_GRANT_TYPE,
+
             GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
             GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
             GITHUB_REDIRECT_URI: process.env.GITHUB_REDIRECT_URI,
             GITHUB_GRANT_TYPE: process.env.GITHUB_GRANT_TYPE,
+
             NAVER_CLIENT_ID: process.env.NAVER_CLIENT_ID,
             NAVER_CLIENT_SECRET: process.env.NAVER_CLIENT_SECRET,
             NAVER_REDIRECT_URI: process.env.NAVER_REDIRECT_URI,
             NAVER_GRANT_TYPE: process.env.NAVER_GRANT_TYPE,
             NAVER_REFRESH_TYPE: process.env.NAVER_REFRESH_TYPE
         }),
+        FileModule.forRoot({}),
         PostsModule,
         CommentsModule,
         UserModule

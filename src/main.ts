@@ -1,5 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
+import { urlencoded, json } from "express";
 import * as morgan from "morgan";
 import * as cookieParser from "cookie-parser";
 import * as helmet from "helmet";
@@ -31,6 +32,8 @@ async function bootstrap() {
         })
     );
     app.use(cookieParser(configService.get("SESSION_KEY")));
+    app.use(json({ limit: "50mb" }));
+    app.use(urlencoded({ extended: true, limit: "50mb" }));
 
     app.use(HealthcheckMiddleware);
 

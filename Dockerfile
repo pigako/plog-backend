@@ -7,6 +7,7 @@ ENV APP_NAME=${APP_NAME}
 # 앱 디렉터리 생성
 WORKDIR /usr/src/app
 
+COPY api-account.json .
 COPY ./ .
 
 # npm 설치
