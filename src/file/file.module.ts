@@ -3,6 +3,7 @@ import { CONFIG_OPTIONS, GCS_BUCKET } from "src/common/common.constants";
 import { FileModuleOptions } from "./file.interface";
 import { FileService } from "./file.service";
 import { Storage } from "@google-cloud/storage";
+import { FileController } from "./file.controller";
 
 @Module({})
 @Global()
@@ -25,7 +26,8 @@ export class FileModule {
                         return gcsBucket;
                     }
                 }
-            ]
+            ],
+            controllers: [FileController]
         };
     }
 }
