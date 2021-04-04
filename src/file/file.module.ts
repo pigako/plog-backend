@@ -12,6 +12,7 @@ export class FileModule {
         return {
             module: FileModule,
             exports: [FileService],
+            imports: [],
             providers: [
                 FileService,
                 {

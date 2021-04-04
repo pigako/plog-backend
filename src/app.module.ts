@@ -7,7 +7,6 @@ import { CommentsModule } from "./comments/comments.module";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
 import { RedisModule } from "./redis/redis.module";
-import { FileController } from "./file/file.controller";
 import { FileModule } from "./file/file.module";
 
 @Module({

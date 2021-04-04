@@ -8,9 +8,10 @@ export class FileController {
     constructor(private readonly service: FileService) {}
 
     @Post("/upload/image")
-    // @UseInterceptors(FileInterceptor("file"))
-    async uploadImage(@Req() request: Request, @UploadedFile() file: Express.Multer.File) {
+    @UseInterceptors(FileInterceptor("upload"))
+    async uploadImage(@Req() request: Request, @UploadedFile("file") file: Express.Multer.File) {
         console.log(request);
+        console.log(file);
         return { url: "cdn.pigako.com/image/2020" };
     }
 }
