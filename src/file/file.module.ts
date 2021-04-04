@@ -22,7 +22,7 @@ export class FileModule {
                 {
                     provide: GCS_BUCKET,
                     useFactory: async () => {
-                        const gcsBucket = new Storage().bucket("plog-upload-2021-04-01");
+                        const gcsBucket = new Storage().bucket("cdn-plog-2021-04-03");
 
                         return gcsBucket;
                     }

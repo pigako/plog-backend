@@ -10,8 +10,10 @@ export class FileController {
     @Post("/upload/image")
     @UseInterceptors(FileInterceptor("upload"))
     async uploadImage(@Req() request: Request, @UploadedFile("file") file: Express.Multer.File) {
-        console.log(request);
         console.log(file);
-        return { url: "cdn.pigako.com/image/2020" };
+
+        const result = await this.service.uploadImages(file);
+        console.log(result);
+        return result;
     }
 }
