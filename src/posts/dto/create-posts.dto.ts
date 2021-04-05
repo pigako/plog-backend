@@ -1,4 +1,4 @@
-import { IsString } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 import { CoreOutput } from "src/common/dto/output.dto";
 
 export class CreatePostInput {
@@ -7,6 +7,9 @@ export class CreatePostInput {
 
     @IsString()
     contents: string;
+
+    @IsNumber()
+    category: number;
 }
 
 export class CreatePostOutput extends CoreOutput {}

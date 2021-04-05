@@ -8,6 +8,9 @@ import { ConfigService } from "@nestjs/config";
 import { ValidationPipe } from "@nestjs/common";
 import { HealthcheckMiddleware } from "./middleware/healthcheck.middleware";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { NotFoundExceptionFilter } from "./filter/NotFound.filter";
+import { ForbiddenExceptionFilter } from "./filter/Forbidden.filter";
+import { BadRequestExceptionFilter } from "./filter/BadRequest.filter";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {});
@@ -20,7 +23,7 @@ async function bootstrap() {
         credentials: true,
         origin: process.env.NODE_ENV === "production" ? "https://www.pigako.com" : true
     });
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } }));
     app.use(helmet());
     app.use(
         morgan("dev", {
@@ -37,15 +40,22 @@ async function bootstrap() {
 
     app.use(HealthcheckMiddleware);
 
+    app.useGlobalFilters(new NotFoundExceptionFilter());
+    app.useGlobalFilters(new ForbiddenExceptionFilter());
+    app.useGlobalFilters(new BadRequestExceptionFilter());
+
     const config = new DocumentBuilder()
         .setTitle("Pigako Blog API")
         .setVersion("1.0")
-        .addTag("Plog")
-        .addCookieAuth("connect.sid")
+        .addCookieAuth("PLOG")
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup("api/v1/swagger", app, document);
+    SwaggerModule.setup("api/v1/swagger", app, document, {
+        // swaggerOptions: { defaultModelsExpandDepth: -1 },
+        customSiteTitle: "Plog Api Docs"
+        // customfavIcon: "../../favicon.ico"
+    });
 
     const port = process.env.NODE_ENV === "production" ? 80 : 4000;
 
