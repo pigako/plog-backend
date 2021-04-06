@@ -19,6 +19,8 @@ export class PostsController {
     @Get("/")
     @ApiOperation({ summary: "게시글 리스트 조회" })
     @ApiResponse({ status: HttpStatus.OK, type: GetPostsResponse, description: "게시글 리스트 조회" })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: PickType(Response, ["error"]) })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, type: PickType(Response, ["error"]) })
     async list(@Query() page: PageDTO, @Query() searchKeyword: SearchKeywordDTO): Promise<GetPostsOutput> {
         return await this.service.getList(page, searchKeyword);
     }
@@ -26,11 +28,17 @@ export class PostsController {
     @Post("/")
     @UseGuards(AuthGuard)
     @ApiCookieAuth()
+    @ApiOperation({ summary: "게시글 생성" })
+    @ApiResponse({ status: HttpStatus.CREATED, description: "게시글 생성" })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: PickType(Response, ["error"]) })
+    @ApiResponse({ status: HttpStatus.FORBIDDEN, type: PickType(Response, ["error"]) })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, type: PickType(Response, ["error"]) })
     async create(@Body() createPostInput: CreatePostInput, @User() user): Promise<CreatePostOutput> {
         return await this.service.create(createPostInput, user.userId);
     }
 
     @Get("/:id")
+    @ApiOperation({ summary: "게시글 조회" })
     @ApiParam({ name: "id", description: "게시글 고유아이디" })
     async getPost(@Param("id") id: number): Promise<GetPostOutput> {
         return await this.service.getPost(id);

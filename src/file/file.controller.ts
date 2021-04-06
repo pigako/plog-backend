@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, HttpException, Post, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiTags, PickType } from "@nestjs/swagger";
 import { Request } from "express";
+import { UploadFileResponse } from "./dto/file.dto";
 import { FileService } from "./file.service";
 
 @ApiTags("File")
@@ -11,11 +12,12 @@ export class FileController {
 
     @Post("/upload/image")
     @UseInterceptors(FileInterceptor("upload"))
-    async uploadImage(@Req() request: Request, @UploadedFile("file") file: Express.Multer.File) {
-        console.log(file);
-
+    async uploadImage(@Req() request: Request, @UploadedFile("file") file: Express.Multer.File): Promise<UploadFileResponse["data"]> {
         const result = await this.service.uploadImages(file);
-        console.log(result);
-        return result;
+        if (!result.result) {
+            throw new HttpException(result.error, result.statusCode);
+        }
+
+        return result.data;
     }
 }
