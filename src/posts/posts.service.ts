@@ -90,6 +90,7 @@ export class PostsService {
     // 게시물 조회
     async getPost(postId: number): Promise<GetPostOutput> {
         try {
+            // TODO 게시글 있는지 없는지 조회
             await this.post.increment({ id: postId }, "lookup", 1);
             const data = await this.post.findOne(postId);
 

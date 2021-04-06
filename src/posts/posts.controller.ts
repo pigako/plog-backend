@@ -40,6 +40,9 @@ export class PostsController {
     @Get("/:id")
     @ApiOperation({ summary: "게시글 조회" })
     @ApiParam({ name: "id", description: "게시글 고유아이디" })
+    @ApiResponse({ status: HttpStatus.OK, type: GetPostsOutput, description: '게시글' })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: PickType(Response, ["error"]) })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, type: PickType(Response, ["error"]) })
     async getPost(@Param("id") id: number): Promise<GetPostOutput> {
         return await this.service.getPost(id);
     }
