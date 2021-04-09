@@ -10,7 +10,7 @@ export class CoreEntity {
     @ApiProperty({ description: "생성일시" })
     createdAt: Date;
 
-    @UpdateDateColumn({ "type": "timestamp" })
+    @UpdateDateColumn({ "type": "timestamp", select: false })
     @ApiHideProperty()
     updatedAt: Date;
 }

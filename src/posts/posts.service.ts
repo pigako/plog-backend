@@ -40,6 +40,7 @@ export class PostsService {
             pagination.makePaging();
 
             const data = await this.post.find({
+                select: ["id", "title", "category", "lookup"],
                 where: where,
                 order: {
                     "id": "DESC"
