@@ -8,9 +8,15 @@ import { GoogleUser } from "src/entities/google-user.entity";
 import { KakaoUser } from "src/entities/kakao-user.entity";
 import { GithubUser } from "src/entities/github-user.entity";
 import { NaverUser } from "src/entities/naver-user.entity";
+import { GoogleModule } from './google/google.module';
+import { KakaoModule } from './kakao/kakao.module';
+import { GithubModule } from './github/github.module';
+import { NaverModule } from './naver/naver.module';
 
 @Global()
-@Module({})
+@Module({
+  imports: [GoogleModule, KakaoModule, GithubModule, NaverModule]
+})
 export class AuthModule {
     static forRoot(options: AuthModuleOptions): DynamicModule {
         return {
